@@ -1,0 +1,46 @@
+#include "pch.h"
+#include <iostream>
+#include <math.h>
+using namespace std;
+struct vector
+{double x, y;};
+vector operator+(vector v, vector w)
+{vector s;
+s.x = v.x + w.x;
+s.y = v.y + w.y;
+return s;}
+vector operator-(vector v, vector w)
+{vector s;
+	s.x = v.x - w.x;
+	s.y = v.y - w.y;
+	return s;}
+vector operator-(vector v)
+{vector s;
+	s.x = -v.x;
+	s.y = -v.y;
+	return s;}
+double operator*(vector v, vector w)
+{return v.x * w.x + v.y * w.y;}
+int main()
+{        setlocale(LC_ALL, "rus");
+	double a, b, c, d;
+	cout << "Введите координаты первого вектора" << endl;
+	cout << "Координата x " << endl;
+	cin >> a;
+	cout << "Координата у " << endl;
+	cin >> b;
+	cout << "Введите координаты второго вектора" << endl;
+	cout << "Координата x " << endl;
+	cin >> c;
+	cout << "Координата у " << endl;
+	cin >> d;
+	vector p = { a,b }, q = { c,d }, j, k, l;
+	j = p + q;
+	cout << "Сложение векторов {" << j.x << ";" << j.y << "}" << endl;
+	k = p - q;
+	cout << "Вычитание векторов {" << k.x << ";" << k.y << "}" << endl;
+	cout << " Сколярное умножение " << p * q << endl;
+	l = -p;
+	cout << "Вектор противоположный первому {" << l.x << ";" << l.y << "}" << endl;
+	return 0;
+}
