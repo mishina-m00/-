@@ -1,0 +1,561 @@
+#include "stdafx.h"
+#include <math.h>
+#include <iomanip>
+#include <iostream>
+
+using namespace std;
+
+double pr4(double a[4][4]) //вывод матрицы 4 на 4
+{
+	int i, j;
+	for (i = 0; i < 4; i++)
+	{
+		for (j = 0; j < 4; j++)
+			std::cout<< fixed << setprecision(0) << a[i][j] << "\t";
+		std::cout << endl;
+	}
+	std::cout << endl;
+	return 0;
+}
+double pr3(double a[3][3]) //вывод матрицы 3 на 3
+{
+	int i, j;
+	for (i = 0; i < 3; i++)
+	{
+		for (j = 0; j < 3; j++)
+			std::cout << fixed << setprecision(0) << a[i][j] << "\t";
+		std::cout << endl;
+	}
+	std::cout << endl;
+	return 0;
+}
+double m_poloj(double m[4][4], int b, int q)
+{
+    m[0][0] = cos(b * q);
+	m[0][1] = -sin(b * q);
+	m[1][0] = sin(b * q);
+	m[1][1] = cos(b * q);
+	m[2][2] = 1;
+	m[3][3] = 1;
+
+		for (int i = 0; i < 2; i++)
+		{
+			m[2][i] = 0;
+		}
+		for (int i = 0; i < 3; i++)
+		{
+			m[3][i] = 0;
+		
+		}
+		for (int i = 0; i < 2; i++)
+		{
+			m[i][2] = 0;
+		}
+		for (int i = 0; i < 3; i++)
+		{
+			m[i][3] = 0;
+		}
+	return m[4][4];
+}
+ 
+double mult(double a[4][4], double b[4][4], double c[4][4]) //умножение матриц a b
+{
+	int i, j, t;
+	
+	for ( i = 0; i < 4; i++) {             
+		for ( j = 0; j < 4; j++) {
+			for (t = 0; t < 4; t++) {
+				c[i][j] += a[i][t] * b[t][j];
+
+			}
+		}
+	}
+	return c[4][4];
+}
+
+double opred(double M[3][3]) // Нахождение определителя матрицы 3х3
+{	double OM;
+	OM = M[0][0] * (M[1][1] * M[2][2] - M[1][2] * M[2][1]) - M[0][1] * (M[1][0] * M[2][2]
+		- M[1][2] * M[2][0]) + M[0][2] * (M[1][0] * M[2][1] - M[1][1] * M[2][0]);
+	return OM;
+}
+double metod_kramera(double m1[3][3], double m2[3][1], double Q[3][1]) //решение слау методом крамера
+{
+	double dop1[3][3], dop2[3][3], dop3[3][3];
+	int i, j, t;
+	if (opred(m1) == 0) {
+		std::cout << "Определитель матрицы Якоби равен 0" << endl;
+	}
+	else {
+		for (i = 0; i < 3; i++) {
+			for (j = 0; j < 3; j++)
+			{
+
+				dop1[i][j] = m1[i][j];
+				dop2[i][j] = m1[i][j];
+				dop3[i][j] = m1[i][j];
+			}
+		}
+		for (i = 0; i < 3; i++)
+		{
+			dop1[i][0] = m2[i][0];
+		}
+		for (i = 0; i < 3; i++)
+		{
+			dop2[i][1] = m2[i][0];
+		}
+		for (i = 0; i < 3; i++)
+		{
+			dop3[i][2] = m2[i][0];
+		}
+		Q[0][0] = opred(dop1) / opred(m1);
+		Q[1][0] = opred(dop2) / opred(m1);
+		Q[2][0] = opred(dop3) / opred(m1);
+		std::cout << " приращенная обобщеная координата" << endl;
+		for (i = 0; i < 3; i++)
+		{
+			for (j = 0; j < 1; j++)
+				
+				std::cout << fixed << setprecision(2) << Q[i][j] << "\t";
+			std::cout << endl;
+ 
+		}
+		return Q[3][1];
+	}
+}
+//составление элементов матрицы Якоби
+double make_J1(double J[1][1], double ord[1][4], double D[4][4], double a[4][4], double b[4][4], double c[4][4], double r3[4][1])
+{
+	int i, j, t;
+	double A03D11[4][4], A01D[4][4], A012[4][4];
+	
+	double m1[1][4];
+	for (int i = 0; i < 1; i++)
+	{
+		for (int j = 0; j < 4; j++)
+		{
+			m1[i][j] = 0;
+			for (int t = 0; t < 4; t++)
+			{
+				m1[i][j] += (a[i][t]) * (D[t][j]);
+			}
+		}
+	}
+
+	double m2[1][4];
+	for (int i = 0; i < 1; i++)
+	{
+		for (int j = 0; j < 4; j++)
+		{
+			m2[i][j] = 0;
+			for (int t = 0; t < 4; t++)
+			{
+				m2[i][j] += (m1[i][t]) * (b[t][j]);
+			}
+		}
+	}
+
+	double m3[1][4];
+	for (int i = 0; i < 1; i++)
+	{
+		for (int j = 0; j < 4; j++)
+		{
+			m3[i][j] = 0;
+			for (int t = 0; t < 4; t++)
+			{
+				m3[i][j] += (m2[i][t]) * (c[t][j]);
+			}
+		}
+	}
+
+	double m4[1][4];
+	for (int i = 0; i < 1; i++)
+	{
+		for (int j = 0; j < 4; j++)
+		{
+			m4[i][j] = 0;
+			for (int t = 0; t < 4; t++)
+			{
+				m4[i][j] += (m3[i][t]) * (r3[t][j]);
+			}
+		}
+ 
+	}
+
+	for (int i = 0; i < 1; i++)
+	{
+		for (int j = 0; j < 1; j++)
+		{
+			J[i][j] = 0;
+			for (int t = 0; t < 4; t++)
+			{
+				J[i][j] += (ord[i][t]) * (m4[t][j]);
+			}
+		}
+	}
+
+	return J[1][1];
+
+}
+double make_J2(double J[1][1], double ord[1][4], double D[4][4], double a[4][4], double b[4][4], double c[4][4], double r3[4][1])
+{
+	int i, j, t;
+	double A03D11[4][4], A01D[4][4], A012[4][4];
+
+	double m1[1][4];
+	for (int i = 0; i < 1; i++)
+	{
+		for (int j = 0; j < 4; j++)
+		{
+			m1[i][j] = 0;
+			for (int t = 0; t < 4; t++)
+			{
+				m1[i][j] += (a[i][t]) * (b[t][j]);
+			}
+		}
+	}
+
+	double m2[1][4];
+	for (int i = 0; i < 1; i++)
+	{
+		for (int j = 0; j < 4; j++)
+		{
+			m2[i][j] = 0;
+			for (int t = 0; t < 4; t++)
+			{
+				m2[i][j] += (m1[i][t]) * (D[t][j]);
+			}
+		}
+	}
+
+	double m3[1][4];
+	for (int i = 0; i < 1; i++)
+	{
+		for (int j = 0; j < 4; j++)
+		{
+			m3[i][j] = 0;
+			for (int t = 0; t < 4; t++)
+			{
+				m3[i][j] += (m2[i][t]) * (c[t][j]);
+			}
+		}
+	}
+ 
+double m4[1][4];
+	for (int i = 0; i < 1; i++)
+	{
+		for (int j = 0; j < 4; j++)
+		{
+			m4[i][j] = 0;
+			for (int t = 0; t < 4; t++)
+			{
+				m4[i][j] += (m3[i][t]) * (r3[t][j]);
+			}
+		}
+	}
+
+	for (int i = 0; i < 1; i++)
+	{
+		for (int j = 0; j < 1; j++)
+		{
+			J[i][j] = 0;
+			for (int t = 0; t < 4; t++)
+			{
+				J[i][j] += (ord[i][t]) * (m4[t][j]);
+			}
+		}
+	}
+
+	return J[1][1];
+
+}
+double make_J3(double J[1][1], double ord[1][4], double D[4][4], double a[4][4], double b[4][4], double c[4][4], double r3[4][1])
+{
+	int i, j, t;
+	double A03D11[4][4], A01D[4][4], A012[4][4];
+
+	double m1[1][4];
+	for (int i = 0; i < 1; i++)
+	{
+		for (int j = 0; j < 4; j++)
+		{
+			m1[i][j] = 0;
+			for (int t = 0; t < 4; t++)
+			{
+				m1[i][j] += (a[i][t]) * (b[t][j]);
+			}
+		}
+	}
+
+	double m2[1][4];
+	for (int i = 0; i < 1; i++)
+	{
+		for (int j = 0; j < 4; j++)
+		{
+			m2[i][j] = 0;
+			for (int t = 0; t < 4; t++)
+			{
+				m2[i][j] += (m1[i][t]) * (c[t][j]);
+			}
+		}
+	} 
+double m3[1][4];
+	for (int i = 0; i < 1; i++)
+	{
+		for (int j = 0; j < 4; j++)
+		{
+			m3[i][j] = 0;
+			for (int t = 0; t < 4; t++)
+			{
+				m3[i][j] += (m2[i][t]) * (D[t][j]);
+			}
+		}
+	}
+
+	double m4[1][4];
+	for (int i = 0; i < 1; i++)
+	{
+		for (int j = 0; j < 4; j++)
+		{
+			m4[i][j] = 0;
+			for (int t = 0; t < 4; t++)
+			{
+				m4[i][j] += (m3[i][t]) * (r3[t][j]);
+			}
+		}
+	}
+
+	for (int i = 0; i < 1; i++)
+	{
+		for (int j = 0; j < 1; j++)
+		{
+			J[i][j] = 0;
+			for (int t = 0; t < 4; t++)
+			{
+				J[i][j] += (ord[i][t]) * (m4[t][j]);
+			}
+		}
+	}
+
+	return J[1][1];
+}
+
+int main()
+{
+	setlocale(LC_ALL, "RUS");
+	const double pi = 3.141592653589793;
+	int i, j,t, kod1, kod2, kod3;
+	int l1, l2, l3, beta,q1,q2,q3;
+	double itr[1][4] = { 1, 0, 0, 0}; //i транспонированная 
+	double jtr[1][4] = { 0, 1, 0, 0 };
+	double ktr[1][4] = { 0, 0, 1, 0 };
+	double Dvr[4][4] = { { 0, -1, 0, 0}, { 1, 0, 0, 0 }, { 0, 0, 0, 0}, { 0, 0, 0, 0 } };
+	double Dp[4][4] = {{0, 0, 0, 0}, {0, 0, 0, 0}, {0, 0, 0, 1}, {0, 0, 0, 0}};
+	double r[4][1], m_x[3][1],m_xn[3][1],dx[3][1];
+	double dq[3][1];
+	double y90, y180,yq,yq1;
+	y90 = (180 / pi) * 90;
+	y180 = (180 / pi) * 180;
+
+	cout << "Введите длины звеньев";
+	cin >> l1 >> l2 >> l3; 
+cout << "Введите значение вращательной шарнирной координаты";
+	cin >> q1;
+	cout << "Введите значение поступательной шарнирной координаты";
+	cin >> q2;
+	cout << "Введите значение вращательной шарнирной координаты";
+	cin >> q3;
+	cout << "код для звеньев:\n 1 - вращательная пара, ось вр. перпендикулярна;\n 2 - вращательная пара, ось вр. совпадает с осью одного звена;\n 3 - поступательная пара.\n " << endl;
+
+	cout << "Введите код 1 звена" << endl;
+	cin >> kod1;
+	double AS00[4][4];
+double AS00[4][4] = { { 1, 0, 0, 0 },
+						{ 0, 1, 0, 0 },
+						{ 0, 0, 1, 0},
+						{ 0, 0, 0, 1} };
+cout << "Матрица А00";
+cout << endl;
+pr4(AS00);
+double AS01[4][4];
+if (kod1 == 1 || kod1 == 2)
+{
+	beta = 1;
+	m_poloj(AS01, beta, q1);
+}
+if (kod1 == 3)
+{
+	beta = 0;
+	m_poloj(AS01, beta, q2);
+}
+cout << "Матрица АS01";
+pr4(AS01);
+cout << endl;
+
+double A01[4][4] = { 0 };
+mult(AS00, AS01, A01);
+cout << "Матрица А01";
+pr4(A01);
+cout << endl;
+cout << "Введите код 2 звена" << endl;
+cin >> kod2;
+double AS11[4][4] = { { cos(y90), cos(0), cos(y90), 0 },
+					  { cos(y90), cos(y90), cos(0), 0 },
+					  { cos(0), cos(y90), cos(y90), l1  },
+					  { 0, 0, 0, 1 } };
+cout << "Матрица АS11";
+pr4(AS11);
+cout << endl;
+double AS12[4][4];
+if (kod2 == 1 || kod2 == 2)
+{
+	beta = 1;
+	m_poloj(AS12, beta, q1);
+}
+if (kod2 == 3)
+{
+	beta = 0;
+	m_poloj(AS12, beta, q2);
+}
+ 
+cout << "Матрица АS12";
+pr4(AS12);
+cout << endl;
+double A12[4][4] = { 0 };
+mult(AS11, AS12, A12);
+cout << "Матрица А12";
+pr4(A12);
+
+cout << "Введите код 3 звена" << endl;
+cin >> kod3;
+
+double AS22[4][4] = { { cos(y90), cos(0), cos(y90), 0},
+					  { cos(y90), cos(y90), cos(0), 0 },
+					  { cos(0), cos(y90), cos(y90), l2 },
+					  { 0, 0, 0, 1 } };
+cout << "Матрица АS22";
+pr4(AS22);
+cout << endl;
+double AS23[4][4];
+if (kod3 == 1 || kod3 == 2)
+{
+	beta = 1;
+	m_poloj(AS23, beta, q1);
+}
+if (kod3 == 3)
+{
+	beta = 0;
+	m_poloj(AS23, beta, q2);
+}
+cout << "Матрица АS23";
+pr4(AS23);
+cout << endl;
+double A23[4][4] = { 0 };
+mult(AS22, AS23, A23);
+cout << "Матрица А12";
+pr4(A23);
+cout << "Матрица А03" << endl;
+	pr4(A03);
+	cout << "Введите координаты TCP относительно 3-го звена" << endl;
+	r[3][0] = 1;
+	for (i = 0; i < 3; i++)
+	{
+		for (j = 0; j < 1; j++)
+			cin >> r[i][j];
+	}
+	cout << "Введите абсолютные координаты конечного звена " << endl;
+	for (i = 0; i < 3; i++)
+	{
+		for (j = 0; j < 1; j++)
+			cin >> m_x[i][j];
+	}
+
+	cout << "Введите кординаты для следующей точки " << endl;
+	for (i = 0; i < 3; i++)
+	{
+		for (j = 0; j < 1; j++)
+			cin >> m_xn[i][j];
+	}
+	for (i = 0; i < 3; i++)
+	{
+		for (j = 0; j < 1; j++)
+		{
+			dx[i][j] = m_xn[i][j] - m_x[i][j];
+		}} 
+double M_Jakobi[3][3], J11[1][1], J12[1][1], J13[1][1], J21[1][1], J22[1][1], J23[1][1], J31[1][1], J32[1][1], J33[1][1];
+	if (kod1 == 1 )
+	{
+		make_J1(J11, itr, Dvr, A01, A12, A23, r);
+		make_J2(J12, itr, Dvr, A01, A12, A23, r);
+		make_J3(J13, itr, Dvr, A01, A12, A23, r);
+	}
+	if (kod1 == 2)
+	{
+		make_J1(J11, itr, Dvr, A01, A12, A23, r);
+		make_J2(J12, itr, Dvr, A01, A12, A23, r);
+		make_J3(J13, itr, Dvr, A01, A12, A23, r);
+	}
+	if (kod1 == 3)
+	{
+		make_J1(J11, itr, Dp, A01, A12, A23, r);
+		make_J2(J12, itr, Dp, A01, A12, A23, r);
+		make_J3(J13, itr, Dp, A01, A12, A23, r);
+	}
+	if (kod2 == 1)
+	{
+		make_J1(J21, itr, Dvr, A01, A12, A23, r);
+		make_J2(J22, itr, Dvr, A01, A12, A23, r);
+		make_J3(J23, itr, Dvr, A01, A12, A23, r);
+
+	}
+	if (kod2 == 2)
+	{
+		make_J1(J21, itr, Dvr, A01, A12, A23, r);
+		make_J2(J22, itr, Dvr, A01, A12, A23, r);
+		make_J3(J23, itr, Dvr, A01, A12, A23, r);
+
+	}
+	if (kod2 == 3)
+	{
+		make_J1(J21, itr, Dp, A01, A12, A23, r);
+		make_J2(J22, itr, Dp, A01, A12, A23, r);
+		make_J3(J23, itr, Dp, A01, A12, A23, r);
+	}
+	if (kod3 == 1 )
+	{
+		make_J1(J31, itr, Dvr, A01, A12, A23, r);
+		make_J2(J32, itr, Dvr, A01, A12, A23, r);
+		make_J3(J33, itr, Dvr, A01, A12, A23, r);
+	}
+	if (kod3 == 2)
+	{
+		make_J1(J31, itr, Dvr, A01, A12, A23, r);
+		make_J2(J32, itr, Dvr, A01, A12, A23, r);
+		make_J3(J33, itr, Dvr, A01, A12, A23, r);
+	}
+	if (kod3 == 3)
+	{
+		make_J1(J31, itr, Dp, A01, A12, A23, r);
+		make_J2(J32, itr, Dp, A01, A12, A23, r);
+		make_J3(J33, itr, Dp, A01, A12, A23, r);
+	}
+
+	M_Jakobi[0][0] = J11[0][0];
+	M_Jakobi[0][1] = J12[0][0];
+	M_Jakobi[0][2] = J13[0][0]; 
+M_Jakobi[1][0] = 1;
+	M_Jakobi[1][1] = 1;
+	M_Jakobi[1][2] = J23[0][0];
+	M_Jakobi[2][0] = J31[0][0];
+	M_Jakobi[2][1] = J32[0][0];
+	M_Jakobi[2][2] = 25;
+	cout << "матрица Якоби" << endl;;
+	pr3(M_Jakobi);
+	cout << endl;
+	metod_kramera(M_Jakobi, dx, dq);
+	
+	cout << endl;
+
+	system("pause");
+	return 0;
+}
